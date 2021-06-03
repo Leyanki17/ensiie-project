@@ -1,39 +1,29 @@
 <?php
 
-require_once '../src/Bootstrap.php';
 
-$userRepository = new \User\UserRepository(\Db\Connection::get());
-$users = $userRepository->fetchAll();
+require_once "../src/Bootstrap.php";
+
+    error_reporting(E_ALL);
+    ini_set("display_errors", 1);
+    
+    /**
+     * Connexion à la base de donnéé 
+     */
+    try{
+        $bd= \Db\Connection::get();
+        $bd->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+    }catch(PDOEXCEPTION $e){
+        die($e->getMessage());
+    }
+    
+   
+    
+    // instanciation de notre router
+    $router= new Router();
+    
+// var_dump($router);
+    
+    // passe la base de donnée en paramétre de main
+    $router->main(new \model\ChansonStoragePgsql($bd),new \model\AccountStoragePgsql($bd));
+     
 ?>
-
-<html>
-<head>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
-
-</head>
-<body>
-
-<div class="container">
-    <h3><?php echo 'Hello world from Docker! php' . PHP_VERSION; ?></h3>
-
-    <table class="table table-bordered table-hover table-striped">
-        <thead style="font-weight: bold">
-            <td>#</td>
-            <td>Firstname</td>
-            <td>Lastname</td>
-            <td>Age</td>
-        </thead>
-        <?php /** @var \User\User $user */
-        foreach ($users as $user) : ?>
-            <tr>
-                <td><?php echo $user->getId() ?></td>
-                <td><?php echo $user->getFirstname() ?></td>
-                <td><?php echo $user->getLastname() ?></td>
-                <td><?php echo $user->getAge() ?> years</td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
-</div>
-</body>
-</html>
