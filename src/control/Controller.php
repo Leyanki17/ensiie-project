@@ -104,8 +104,8 @@
         /**
          * Permet de de sauvegarder une nouvelle chanson;
          */
-        public function saveNewChanson(array $data){   
-            $chansonBuilder= new \model\ChansonBuilder($data);
+        public function saveNewChanson(array $data, array $file){   
+            $chansonBuilder= new \model\ChansonBuilder($data,$file);
             if($chansonBuilder->isValid()){
                 $chanson= $chansonBuilder->createChanson();
                 
@@ -178,7 +178,7 @@
         public function updateChanson(array $data,$id){
             $chansonBuilder= new \model\ChansonBuilder($data);
             $idSessionChanson="currentUpdateChanson".$id;
-            if($chansonBuilder->isValid()){
+            if($chansonBuilder->isValidForUpdate()){
                 $this->chansons->update($id ,$chansonBuilder->createChanson());
                 unset( $_SESSION[$idSessionChanson]);
                 $this->view->displayUpdateChansonSuccess($id);

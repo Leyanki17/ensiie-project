@@ -113,7 +113,7 @@
                         case 'sauverNouveau':
                             if($_SERVER["REQUEST_METHOD"] === "POST"){
                                 if(key_exists("user",$_SESSION)){
-                                    $controllerChansons->saveNewChanson($_POST);
+                                    $controllerChansons->saveNewChanson($_POST,$_FILES);
                                 }else{
                                     $this->view->displayConnexionFeedback("Vous devez etre connecter pour enregistrer une nouvelle chanson");
                                 } 
@@ -151,10 +151,11 @@
                         break;
                         case 'confirmInscription':
                             if($_SERVER["REQUEST_METHOD"] === "POST"){
-                                $controllerAccount->saveAccount($_POST);
+                                $controllerAccount->saveAccount($_POST,$_FILES);
                             }else{
                                 $this->view->makePageUnaccessible();
                             }
+                        break;
                         default:
                             if(key_exists("user",$_SESSION)){
                                 $controllerChansons->showInformation($action);

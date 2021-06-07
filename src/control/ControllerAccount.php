@@ -28,16 +28,23 @@
         /**
         * Inscription d'un account;
         */
-        public function saveAccount(array $data){
-            $accountBuilder= new \model\AccountBuilder($data);
+        public function saveAccount(array $data, array $file){
+            
+            $accountBuilder= new \model\AccountBuilder($data,$file);
           
             if($accountBuilder->isValid()){
                 $account = $accountBuilder->createAccount();
-                $this->accountBd->create($account);
-                if(key_exists("newAccount", $_SESSION)){
-                    unset($_SESSION["newAccount"]);
-                } 
-                $this->view->displayCreationAccountSuccess();
+                if(!$this->accountBd->isLoginAlreadyUser($account->getLogin())){
+                    $this->accountBd->create($account);
+                    if(key_exists("newAccount", $_SESSION)){
+                        unset($_SESSION["newAccount"]);
+                    } 
+                    $this->view->displayCreationAccountSuccess();
+                }else{
+                    $accountBuilder->setAttError(\model\AccountBuilder::LOGIN_REF, "Le login est déjà utilisé. Veuillez choisir un autre.");
+                    $_SESSION["newAccount"]=$accountBuilder;
+                    $this->view->displayCreationAccountFailure();
+                }
             }else{
                 $_SESSION["newAccount"]=$accountBuilder;
                 $this->view->displayCreationAccountFailure();
@@ -87,11 +94,11 @@
         /**
          * Creation d'utilisateur builder à partie  de la session si elle existe sinon à parti d'un tableau
          */
-        public function newAccount($data=array()){
+        public function newAccount($data=array(),$file=[]){
             if(key_exists("newAccount",$_SESSION)){
                 return $_SESSION["newAccount"];
             }else{
-                return new \model\AccountBuilder($data);
+                return new \model\AccountBuilder($data,$file);
             }
         }
 

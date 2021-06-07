@@ -87,11 +87,14 @@
          */
         public function makeChansonPage($chanson,$id=null){
             $this->title= $chanson->getTitre();
-            $this->content='<div class="card">'.$chanson->getTitre().' est un chanson produite par  '.$chanson->getArtistes().'Cette 
+            $this->content='
+            <div class="card">'.$chanson->getTitre().' est un chanson produite par  '.$chanson->getArtistes().'Cette 
             chanson fait partie de son album '.$chanson->getAlbum().' <br />'
             .$chanson->getTitre().' est sortie officiellement en l\'an '. $chanson->getDates().'Cette chanson est du registre 
             '.$chanson->getStyle().'<br />';
             ;
+
+            $this->content.='<div><audio src ="'.$chanson->getMusique().'" controls></audio></div>';
 
             // var_dump($_SESSION);
 
@@ -121,16 +124,16 @@
           
           $nomValue= key_exists($account::NOM_REF ,$account->getData()) ? $account->getData()[$account::NOM_REF] : "";
           $loginValue= key_exists($account::LOGIN_REF,$account->getData()) ? $account->getData()[$account::LOGIN_REF] : "";
-          $statutValue= key_exists($account::STATUT_REF,$account->getData()) ? $account->getData()[$account::STATUT_REF] :"";
+          // $statutValue= key_exists($account::STATUT_REF,$account->getData()) ? $account->getData()[$account::STATUT_REF] :"";
           $passwordValue= key_exists($account::PASSWORD_REF,$account->getData()) ? $account->getData()[$account::PASSWORD_REF] : "";
 
-          $nomError= key_exists($account::NOM_REF,$account->getError()) ? $account->getError()[$account::NOM_REF] : "";
-          $loginError= key_exists($account::LOGIN_REF,$account->getError()) ? $account->getError()[$account::LOGIN_REF] : "";
-          $statutError= key_exists($account::STATUT_REF,$account->getError()) ? $account->getError()[$account::STATUT_REF] : "";
-          $passwordError= key_exists($account::PASSWORD_REF,$account->getError()) ? $account->getError()[$account::PASSWORD_REF] : "";
-          $confirmPasswordError= key_exists($account::CONFIRMPASSWORD_REF,$account->getError()) ? $account->getError()[$account::CONFIRMPASSWORD_REF] : "";
-
-          $form='<form method="POST" class="formulaire" action="'.$this->router->getConfirmInscriptionURL().'">
+          $nomError= key_exists($account::NOM_REF,$account->getErrors()) ? $account->getErrors()[$account::NOM_REF] : "";
+          $loginError= key_exists($account::LOGIN_REF,$account->getErrors()) ? $account->getErrors()[$account::LOGIN_REF] : "";
+          // $statutError= key_exists($account::STATUT_REF,$account->getErrors()) ? $account->getErrors()[$account::STATUT_REF] : "";
+          $passwordError= key_exists($account::PASSWORD_REF,$account->getErrors()) ? $account->getErrors()[$account::PASSWORD_REF] : "";
+          $confirmPasswordError= key_exists($account::CONFIRMPASSWORD_REF,$account->getErrors()) ? $account->getErrors()[$account::CONFIRMPASSWORD_REF] : "";
+          $avatarError = key_exists($account::FILE_REF,$account->getErrors()) ? $account->getErrors()[$account::FILE_REF] : "";
+          $form='<form enctype="multipart/form-data" method="POST" class="formulaire" action="'.$this->router->getConfirmInscriptionURL().'">
             <div class="form-input">
               <p class="error">'. $loginError .'</p>
               <label>Login<input class="form-input "type="text" name="'.$account::LOGIN_REF.'"  value="'.$loginValue.'" /></label>
@@ -144,16 +147,19 @@
               <label>Password<input class="form-input "type="password" name="'.$account::PASSWORD_REF.'"  value="'.$passwordValue.'" /></label>
             </div>
             <div class="form-input">
-            <p class="error">'. $confirmPasswordError .'</p>
+              <p class="error">'. $confirmPasswordError .'</p>
               <label>confirmPassword<input class="form-input "type="password" name="'.$account::CONFIRMPASSWORD_REF.'" placeholder="entrer son espéce" value="" /></label>
             </div>
-            <div class="form-input">
-            <p class="error">'. $statutError .'</p>
-              <label>statut<input class="form-input "type="text" name="'.$account::STATUT_REF.'" placeholder="Quelle est votre statut" value="'.  $statutValue.'" /></label>
+            <div>
+            <p class="error">'. $avatarError .'</p>
+              <label for="fichier_a_uploader" title="Recherchez le fichier à uploader !">Envoyer le fichier :</label>
+              <input name="avatar" type="file" id="fichier_a_uploader" />  
             </div>
+
            <div class="form-group center">
               <button type="submit" class="btn btn-blue bnt-form">inscription</button>
            </div>
+           
           </form>';
           $this->title = "Inscription";
           $this->content=$form;
@@ -206,14 +212,15 @@
           $styleValue= key_exists($chansons::STYLE_REF,$chansons->getData()) ? $chansons->getData()[$chansons::STYLE_REF] : "";
           $anneeValue= key_exists($chansons::DATE_REF,$chansons->getData()) ? $chansons->getData()[$chansons::DATE_REF] :"";
 
-          $titreError= key_exists($chansons::TITRE_REF,$chansons->getError()) ? $chansons->getError()[$chansons::TITRE_REF] : "";
-          $artisteError= key_exists($chansons::ARTISTES_REF,$chansons->getError()) ? $chansons->getError()[$chansons::ARTISTES_REF] : "";
-          $albumError= key_exists($chansons::ALBUM_REF,$chansons->getError()) ? $chansons->getError()[$chansons::ALBUM_REF] : "";
-          $styleError= key_exists($chansons::STYLE_REF,$chansons->getError()) ? $chansons->getError()[$chansons::STYLE_REF] : "";
-          $anneeError= key_exists($chansons::DATE_REF,$chansons->getError()) ? $chansons->getError()[$chansons::DATE_REF] : "";
+          $titreError= key_exists($chansons::TITRE_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::TITRE_REF] : "";
+          $artisteError= key_exists($chansons::ARTISTES_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::ARTISTES_REF] : "";
+          $albumError= key_exists($chansons::ALBUM_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::ALBUM_REF] : "";
+          $styleError= key_exists($chansons::STYLE_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::STYLE_REF] : "";
+          $anneeError= key_exists($chansons::DATE_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::DATE_REF] : "";
+          $musicError= key_exists($chansons::FILE_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::FILE_REF] : "";
 
 
-          $form='<form method="POST" class="formulaire" action="'.$this->router->getChansonSaveUrl().'">
+          $form='<form enctype="multipart/form-data" method="POST" class="formulaire" action="'.$this->router->getChansonSaveUrl().'">
             <div class="form-input">
               <p class="error">'. $titreError .'</p>
               <label>Titre<input class="form-input "type="text" name="'.$chansons::TITRE_REF.'"  value="'.$titreValue.'" /></label>
@@ -234,6 +241,13 @@
             <p class="error">'. $anneeError .'</p>
               <label>annee<input class="form-input "type="text" name="'.$chansons::DATE_REF.'" placeholder="entrer son annee" value="'.  $anneeValue.'" /></label>
             </div>
+            <div>
+            <p class="error">'. $musicError .'</p>
+              <label for="fichier_a_uploader" title="Recherchez le fichier à uploader !">Envoyer le fichier :</label>
+              <input name="'.$chansons::FILE_REF.'" type="file" id="fichier_a_uploader" />  
+            </div>
+
+
            <div class="form-group center">
               <button type="submit" class="btn btn-blue bnt-form">Ajouter une nouvelle chanson</button>
            </div>
@@ -270,11 +284,11 @@
           $styleValue= key_exists($chansons::STYLE_REF,$chansons->getData()) ? $chansons->getData()[$chansons::STYLE_REF] : "";
           $anneeValue= key_exists($chansons::DATE_REF,$chansons->getData()) ? $chansons->getData()[$chansons::DATE_REF] :"";
 
-          $titreError= key_exists($chansons::TITRE_REF,$chansons->getError()) ? $chansons->getError()[$chansons::TITRE_REF] : "";
-          $artisteError= key_exists($chansons::ARTISTES_REF,$chansons->getError()) ? $chansons->getError()[$chansons::ARTISTES_REF] : "";
-          $albumError= key_exists($chansons::ALBUM_REF,$chansons->getError()) ? $chansons->getError()[$chansons::ALBUM_REF] : "";
-          $styleError= key_exists($chansons::STYLE_REF,$chansons->getError()) ? $chansons->getError()[$chansons::STYLE_REF] : "";
-          $anneeError= key_exists($chansons::DATE_REF,$chansons->getError()) ? $chansons->getError()[$chansons::DATE_REF] : "";
+          $titreError= key_exists($chansons::TITRE_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::TITRE_REF] : "";
+          $artisteError= key_exists($chansons::ARTISTES_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::ARTISTES_REF] : "";
+          $albumError= key_exists($chansons::ALBUM_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::ALBUM_REF] : "";
+          $styleError= key_exists($chansons::STYLE_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::STYLE_REF] : "";
+          $anneeError= key_exists($chansons::DATE_REF,$chansons->getErrors()) ? $chansons->getErrors()[$chansons::DATE_REF] : "";
 
 
           $form='<form method="POST" action="'.$this->router->getChansonUpdateUrl($id).'">
@@ -298,11 +312,13 @@
             <p class="error">'. $anneeError .'</p>
               <label>annee<input class="form-input "type="text" name="'.$chansons::DATE_REF.'" placeholder="entrer son annee" value="'.  $anneeValue.'" /></label>
             </div>
+
+            <div>
             <div class="form-center center">
-              <button type="submit" class="btn btn-green bnt-form">Ajouter une nouvelle chanson</button>
+              <button type="submit" class="btn btn-green bnt-form">Ajouter une nouvelle chansons</button>
             </div>
           </form>';
-          $this->title = "create de la chanson";
+          $this->title = "modifier chanson";
           $this->content=$form;
 
         }
