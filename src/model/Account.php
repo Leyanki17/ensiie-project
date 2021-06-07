@@ -9,14 +9,22 @@
         private $password;
         private $statut;
         private $description;
+        private $avatar;
+        private $ext;
 
-        public function __construct($id,$nom,$login,$statut,$password,$description=""){
+        public function __construct($id,$nom,$login,$password,$avatar,$ext=null,$statut="user",){
             $this->id=$id;
             $this->nom=$nom;
             $this->login= $login;
             $this->password=$password;
             $this->statut=$statut;
-            $this->description=$description;
+            $this->avatar=$avatar;
+            // echo $avatar;
+            // die("obje");
+            $this->ext=$ext;
+
+            // echo $this->ext;
+            // die("obje");
         }
 
         
@@ -38,9 +46,13 @@
         public function getLogin(){
             return $this->login;
         }
-        public function getDescription(){
-            return $this->description;
+        public function getAvatar(){
+            return $this->avatar;
         }
+        public function getExt(){
+            return $this->ext;
+        }
+       
     }
     
 

@@ -1,9 +1,6 @@
 <?
     namespace model;
     require_once '/var/www/html/src/Bootstrap.php';
-    // require_once ("Account.php");
-    // require_once ("AccountStorage.php");
-
     use PDO;
 
     class AccountStoragePgsql implements AccountStorage{
@@ -16,28 +13,25 @@
         }
         public function getNumberOfElement(){
             if($this->bd){
-                 $req= "SELECT COUNT(*) as nbElement  FROM users";
+                 $req= "SELECT COUNT(*) as nbelement  FROM users";
                  $statement=$this->bd->query($req);
-                 $data=$statement->fetch(PDO::FETCH_OBJ);
-               return $data->nbElement;
+                 $data=$statement->fetch(PDO::FETCH_OBJ);   
+               return $data->nbelement;
              }else{
                 echo "Pas de connection à la base de donnée";
              }
-          }
-  
-        public function getLastInsertElement(){
-            if($this->bd){
-                    $req ="SELECT LAST_INSERT_ID () as lastElement FROM users";
-                    $statement=$this->bd->query($req);
-                    $data = $statement->fetch(PDO::FETCH_OBJ);
-                    return $data->lastElement;
-            }else{
-                    return null;
-            }
-        }
-  
-  
+          } 
         
+          public function isLoginAlreadyUser($log){
+            if($this->bd){
+                 $req= "SELECT COUNT(*) as nbelement  FROM users Where login='$log'";
+                 $statement=$this->bd->query($req);
+                 $data=$statement->fetch(PDO::FETCH_OBJ);   
+               return $data->nbelement;
+             }else{
+                echo "Pas de connection à la base de donnée";
+             }
+          } 
       
         /**
          * Affiche la user qui possede l'id  passé en paramètre
@@ -53,7 +47,7 @@
                 $resultat=$statement->fetch(PDO::FETCH_OBJ);
                 if($resultat->nb>0){
                     return  new \model\Account($resultat->id, $resultat->nom,
-                    $resultat->login,$resultat->statut, $resultat->password, $resultat->description);
+                    $resultat->login, $resultat->password,null, $resultat->statut);
                 }
             }
             return null;
@@ -64,15 +58,21 @@
          * @param Account  à ajouter dans notre base
          */
         public function create(Account $a){
+
             if($this->bd){
-               $req="INSERT INTO users (nom,login,statut,password) values(:nom,:login,:statut,:password)"; 
-               $statement= $this->bd->prepare($req);
-               $statement->bindValue(":nom",$a->getNom());
-               $statement->bindValue(":login",$a->getLogin());
-               $statement->bindValue(":statut",$a->getStatut());
-               $statement->bindValue(":password", $a->getPassword());
+                
+                $id = $this->getNumberOfElement()+1;
+                $req="INSERT INTO users (nom,login,statut,password,avatar) values(:nom,:login,:statut,:password,:avatar)"; 
+                $statement= $this->bd->prepare($req);
+                $statement->bindValue(":nom",$a->getNom());
+                $statement->bindValue(":login",$a->getLogin());
+                $statement->bindValue(":statut","user");
+                $statement->bindValue(":password", $a->getPassword());
+               if(move_uploaded_file($a->getAvatar(), "/var/www/html/public/avatars_img/".$id.".".$a->getExt())){
+                $statement->bindValue(":avatar", "avatars_img/".$id.".".$a->getExt());
+               }
                $statement->execute();
-               return $this->getLastInsertElement();
+               return $id;
             }else{
                 return null;
             }
@@ -140,7 +140,7 @@
                    
                     // on met l'id de l'objet qui est dans notre se comme indice du tableau
                     $data[$resultat->id]= new \model\Account($resultat->id, $resultat->nom,
-                     $resultat->login,$resultat->statut, $resultat->password, $resultat->description);
+                     $resultat->login, $resultat->password,null, $resultat->statut);
                      
                 }
             

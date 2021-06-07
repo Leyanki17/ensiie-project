@@ -20,16 +20,22 @@
         const ARTISTES_REF ="artistes";
         const ALBUM_REF="album";
         const AUTEUR_REF= "auteur";
+        const FILE_REF ="musique";
+        const EXT ="ext";
+        Const MAX_SIZE = 7999999;
+        private $exts = array('mp3','ogg','acc');
 
         private $data;
         private $errors;
+        private $file;
         /**
          * construit un builder 
          * $data contient les informations sur l'objet à construit
          */
-        public function __construct($data){
+        public function __construct($data,$file=null){
             $this->data=$data;
             $this->errors=array();
+            $this->file = $file;
         }
 
         // accesseur 
@@ -37,14 +43,11 @@
             return $this->data;
         }
 
-        public function getError(){
+        public function getErrors(){
             return $this->errors;
         }
 
-        public function isValid(){
-            // var_dump($this->data);
-            // die("ok");
-            // controle sur le titre 
+        public function isValidForUpdate(){
             if($this->data[self::TITRE_REF]==="" || strlen($this->data[self::TITRE_REF])<3){
                 $this->errors[self::TITRE_REF]="Le titre ne dois pas etre vide et contenir mois de 4 charactère";
             }
@@ -57,12 +60,43 @@
                 $this->errors[self::ARTISTES_REF]= "vous devez entrer un artiste avec au moins 4 charactère";
             }
 
-            if(intval($this->data[self::DATE_REF])<1970 || intval($this->data[self::DATE_REF])> 2020){
-                $this->errors[self::DATE_REF]= "entrer une date valide 1970-2020 ";
+            if(intval($this->data[self::DATE_REF])> 2021){
+                $this->errors[self::DATE_REF]= "entrer une année valide (inférieur à 2021). ";
+            }
+            return empty($this->errors) ? true :false;
+        }
+
+        public function isValid(){
+            // var_dump($this->data);
+            // die("ok");
+            // controle sur le titre 
+            $this->isValidForUpdate();
+
+            if(key_exists(self::FILE_REF,$this->file) ){
+                
+                if($this->file[self::FILE_REF]["size"] < self::MAX_SIZE){
+                    $infos = pathinfo($this->file[self::FILE_REF]["name"]);
+                    $ext = $infos["extension"];
+                    if(in_array(strtolower($ext), $this->exts)){
+                        $this->data[self::EXT] =  $ext;
+                        $this->data[self::FILE_REF]= $this->file[self::FILE_REF]["tmp_name"];
+                    }else{
+                        $this->errors[self::FILE_REF]="Le format de la fichier doit être: mp3,acc ou ogg."; 
+                    }
+                }else{
+                    $this->errors[self::FILE_REF]="Taille du fichier trop grande"; 
+                }
+            }else{
+                echo "<pre>";
+                var_dump($this->file);
+                echo "</pre>";
+                die("".$this->file[self::FILE_REF]["error"]);
+                $this->errors[self::FILE_REF]="Vous devez uploader un fichier";
             }
 
             return empty($this->errors) ? true :false;
         }
+
 
         /**
          * Permet de creer une chanson 
@@ -73,7 +107,10 @@
             $style= htmlspecialchars($this->data[self::STYLE_REF]);
             $album= $this->data[self::STYLE_REF]==="" ? "album inconnu" :  htmlspecialchars($this->data[self::ALBUM_REF]);
             $annee=htmlspecialchars($this->data[self::DATE_REF]);
-            return new \model\Chanson($titre,$artiste,$annee,$album,$style);
+            $link= key_exists(self::FILE_REF,$this->data) ? $this->data[self::FILE_REF] : null;
+            $ext = key_exists(self::EXT, $this->data) ? $this->data[self::EXT] : null;
+
+            return new \model\Chanson($titre,$artiste,$annee,$album,$style,$link,$_SESSION["user"]->getId(),$ext);
         }
     }
 

@@ -26,25 +26,11 @@
                  $req= "SELECT COUNT(*) as nbElement  FROM chansons";
                  $statement=$this->bd->query($req);
                  $data=$statement->fetch(PDO::FETCH_OBJ);
-               return $data->nbElement;
+               return $data->nbelement;
              }else{
                 echo "Pas de connection à la base de donnée";
              }
-          }
-  
-        public function getLastInsertElement(){
-            if($this->bd){
-                    $req ="SELECT max(id) as lastElement FROM chansons";
-                    $statement=$this->bd->query($req);
-                    $data = $statement->fetch();
-                    return $data[0];
-            }else{
-                    return null;
-            }
-        }
-  
-  
-        
+        }   
       
         /**
          * Affiche la chanson qui possede l'id  passé en paramètre
@@ -60,7 +46,7 @@
                 $resultat=$statement->fetch(PDO::FETCH_OBJ);
                 if($resultat !=  NULL){
                     return  new \model\Chanson($resultat->titre, $resultat->artistes,
-                     $resultat->dates,$resultat->album, $resultat->style,$resultat->id_user);
+                     $resultat->dates,$resultat->album, $resultat->style,$resultat->link,$resultat->id_user);
                 }
             }
             return null;
@@ -72,9 +58,10 @@
          */
         public function create(Chanson $a){
             if($this->bd){
-                $req= "INSERT INTO chansons (titre,album,dates,style, artistes
+                $id = $this->getNumberOfElement()+1;
+                $req= "INSERT INTO chansons (titre,album,dates,style, link, artistes
                  ,id_user) VALUES(:titre,:album,
-                :dates,:style , :artistes,:id_user) RETURNING id";
+                :dates, :style , :link, :artistes,:id_user) RETURNING id";
                 $statement=$this->bd->prepare($req);
                 $statement->bindValue(':titre', $a->getTitre());
                 $statement->bindValue(':artistes' ,$a->getArtistes());
@@ -82,9 +69,11 @@
                 $statement->bindValue(':dates', $a->getDates());
                 $statement->bindValue(':style' ,$a->getStyle());
                 $statement->bindValue(':id_user' ,$a->getUser());
-                // $statement->bindParam(':album',$a->geAlbum());
-                if($id= $statement->execute()){
-                    return $this->getLastInsertElement();
+                if(move_uploaded_file($a->getMusique(), "/var/www/html/public/musics/".$id.".".$a->getExt())){
+                    $statement->bindValue(':link', "musics/".$id.".".$a->getExt());
+                }
+                if($statement->execute()){
+                    return $id;
                 }else{
                     return -1;
                 }

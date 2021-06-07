@@ -9,14 +9,18 @@
         private $album;
         private $style;
         private $user;
+        private $musique;
+        private $ext;
 
-        public function __construct($titre,$artistes,$dates,$album,$style,$user=null){
+        public function __construct($titre,$artistes,$dates,$album,$style,$musique,$user=null,$ext=null){
             $this->titre=$titre;
             $this->artistes=$artistes;
             $this->dates=$dates;
             $this->album=$album;
             $this->style=$style;
             $this->user=$user;
+            $this->musique=$musique;
+            $this->ext=$ext;
         }
 
         public function getId(){
@@ -40,6 +44,14 @@
         public function getStyle(){
             return $this->style;
         }
+
+        public function getMusique(){
+            return $this->musique;
+        }
+        public function getExt(){
+            return $this->ext;
+        }
+
 
         public function setId($id){
             $this->id= $id;
