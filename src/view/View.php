@@ -98,8 +98,8 @@
 
             // var_dump($_SESSION);
 
-            if($chanson->getUser() ==  $_SESSION["user"]->getId() || $_SESSION["user"]->getStatut() != "admin"){
-              if( $_SESSION["user"]->getStatut() != "admin"){
+            if($chanson->getUser() ==  $_SESSION["user"]->getId() || $_SESSION["user"]->getStatut() == "admin"){
+              if( $_SESSION["user"]->getStatut() == "admin"){
                 $this->content.= '<p>
                 <a class="btn btn-red " href="'.$this->router->getchansonAskDeletionUrl($id).'">Supprimer la chanson </a>
                   <a class="btn btn-green" href="'.$this->router->getchansonAskUpdateURL($id).'">modifier  la chanson </a> 
