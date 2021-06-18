@@ -140,7 +140,7 @@
                    
                     // on met l'id de l'objet qui est dans notre se comme indice du tableau
                     $data[$resultat->id]= new \model\Account($resultat->id, $resultat->nom,
-                     $resultat->login, $resultat->password,null, $resultat->statut);
+                    $resultat->login, $resultat->password,$resultat->avatar,null,$resultat->statut);
                      
                 }
             

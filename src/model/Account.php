@@ -12,7 +12,7 @@
         private $avatar;
         private $ext;
 
-        public function __construct($id,$nom,$login,$password,$avatar,$ext=null,$statut="user",){
+        public function __construct($id,$nom,$login,$password,$avatar,$ext=null,$statut="user"){
             $this->id=$id;
             $this->nom=$nom;
             $this->login= $login;

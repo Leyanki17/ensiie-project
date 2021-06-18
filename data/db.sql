@@ -27,16 +27,6 @@ CONSTRAINT fk_user
 );
 
 
-CREATE TABLE playlist
-(
-id SERIAL NOT NULL UNIQUE PRIMARY KEY,
-nom VARCHAR(60) NOT NULL,
-id_user INTEGER NOT NULL,
-CONSTRAINT fk_user
-	FOREIGN KEY(id_user)
-	REFERENCES "users"(id)
-
-);
 
 CREATE TABLE likes
 (
@@ -52,10 +42,13 @@ CONSTRAINT fk_chanson
 	REFERENCES chansons(id)
 
 );
-
+--mot de passe azerty--
 INSERT INTO "users" (nom, "login", password, "statut") VALUES ('Jordan', 'phoenix','$2y$10$7MnOgj/InpTjksucOH7oQeVeHTRhvEOT127Z.x7K3gJxuf1DDEPfu','admin');
+--mot de passe azerty--
 INSERT INTO "users" (nom, "login", password, "statut") VALUES ('Nicolas', 'Nico','$2y$10$7MnOgj/InpTjksucOH7oQeVeHTRhvEOT127Z.x7K3gJxuf1DDEPfu','admin');
+--mot de passe qwerty--
 INSERT INTO "users" (nom, "login", password, "statut") VALUES ('toto', 'toto','$2y$10$KL2S6L1FEGyrXNmDiymx0ejU4OwXKijDPeFa55qO0FdKtHVFdvWpq','user' );
+--mot de passe querty--
 INSERT INTO "users" (nom, "login", password, "statut") VALUES ('tata', 'dame','$2y$10$KL2S6L1FEGyrXNmDiymx0ejU4OwXKijDPeFa55qO0FdKtHVFdvWpq','user');
 
 

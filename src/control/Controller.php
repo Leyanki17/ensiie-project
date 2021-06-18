@@ -69,8 +69,9 @@
          */
         public function showInformation($id){
             $chanson=$this->chansons->read($id);
+            $chansonsOfUser= $this->chansons->readAll();
             if($chanson){
-                $this->view->makeChansonPage($chanson,$id);
+                $this->view->makeChansonPage($chanson,$chansonsOfUser,$id);
             }else{
             $this->view->makeUnknownChansonPage($id);
             }
@@ -92,14 +93,14 @@
             
         }
 
-        // public function showMyLikedList(){
-        //     if(key_exists("user",$_SESSION)){
-        //         $this->view->makeListPageChanson($this->chansons->readAllFromUser($_SESSION["user"]->getId()));
-        //     }else{
-        //         $this->view->displayConnexionFeedback("Vous devez vous connectez pour voir les musiques vous avez ajouté.");            
-        //     }
+        public function showMyLikedList(){
+            if(key_exists("user",$_SESSION)){
+                $this->view->makeListPageChanson($this->chansons->readPlaylistOfUser($_SESSION["user"]->getId()));
+            }else{
+                $this->view->displayConnexionFeedback("Vous devez vous connectez pour voir les musiques vous avez ajouté.");            
+            }
             
-        // }
+        }
 
         /**
          * Permet de de sauvegarder une nouvelle chanson;
@@ -189,6 +190,7 @@
         
         }
 
+
         /**
          * permet de modifier une chason 
          * @param array tableau de contenant les information pour modifier 
@@ -240,6 +242,24 @@
                 return new \model\ChansonBuilder($data->getArray());
             }
         }
+
+        public function ajaxPlaylist(){
+            $MusicID = intval(htmlspecialchars($_GET['musicID']));
+            $addMusic = new \model\Likes($_SESSION['user']->getId(), $MusicID);
+            die($this->chansons->like($addMusic));
+            
+        }
+
+        public function removePlaylist(){
+            $MusicID = intval(htmlspecialchars($_GET['musicID']));
+            $addMusic = new \model\Likes($_SESSION['user']->getId(), $MusicID);
+            die($this->chansons->dislike($addMusic));
+            
+        }
+
+       
+
+
         
     }
 

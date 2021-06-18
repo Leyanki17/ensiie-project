@@ -1,6 +1,7 @@
 <?php
     namespace view;
 
+    use model\likes;
     
     class View{
         protected $menu;
@@ -17,30 +18,21 @@
 
         public function getMenu(){
          return ' 
-          <ul class="nav">
+          <ul class="nav">  
             <li class="nav-item">
                 <a class="nav-link" href='.$this->router->rootUrl().'> Acceuil</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href='.$this->router->getChansonList().'> Liste des chansons</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href='.$this->router->getChansonCreationUrl().'> Ajout chanson</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href='.$this->router->getMyChansonList().'> Mes Chansons</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href='.$this->router->getLikedChansonList().'> Mes Likes</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href='.$this->router->getAproposUrl().'> A propos</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link btn btn-blue" href='.$this->router->getConnexionURL().'>connexion</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link btn-green" href='.$this->router->getInscriptionURL().'>inscription</a>
+            <hr style="color:white; width:80%;margin-left:auto;margin-right:auto;margin-top:15px;"/>
+            <li class="nav-item container-fluid w-100 row ">
+                <div class="col-6">
+                   <a class="btn btn-blue " href='.$this->router->getConnexionURL().'>connexion</a>
+                </div>
+                <div class="col-6">
+                    <a class="btn btn-green" href='.$this->router->getInscriptionURL().'>inscription</a>
+                </div>
             </li>
           </ul>';
         }
@@ -62,11 +54,6 @@
         }
         
         public function render(){
-      //     echo "<pre>";
-      //     var_dump($_SERVER, "ji");
-          
-      // echo "<pre>";
-      //  die(0);
             include("squelette.php");
            
         }
@@ -76,7 +63,11 @@
          */
         public function welcomePage(){
           $this->setTitle("acceuil");
-          $this->setContent("Bienvenue sur le catalogue de chanson");
+          $this->content= '<h3> Bienvenu(e) votre espace  <h2><em><strong>SPOTIFIIE </strong></em></h2> </h3>
+          <p>
+            Inscrivez vous pour commencer votre aventure.
+          </p>
+      ';  
         
         }
 
@@ -85,35 +76,58 @@
          * @param Objet chanson en represanter
          * @param id de la chanson
          */
-        public function makeChansonPage($chanson,$id=null){
+        public function makeChansonPage($chanson,$list, $id=null){
             $this->title= $chanson->getTitre();
             $this->content='
-            <div class="card">'.$chanson->getTitre().' est un chanson produite par  '.$chanson->getArtistes().'Cette 
+            <div class="">'.$chanson->getTitre().' est un musique créée par  '.$chanson->getArtistes().' Cette 
             chanson fait partie de son album '.$chanson->getAlbum().' <br />'
-            .$chanson->getTitre().' est sortie officiellement en l\'an '. $chanson->getDates().'Cette chanson est du registre 
+            .$chanson->getTitre().' est sortie officiellement en l\'an '. $chanson->getDates().' Elle chanson du style
             '.$chanson->getStyle().'<br />';
-            ;
+            
 
-            $this->content.='<div><audio src ="'.$chanson->getMusique().'" controls></audio></div>';
+            $this->content.='<div><audio src ="'.$chanson->getMusique().'" controls></audio> <i class="fas fa-eye"></i> <span id="liked">'.$chanson->getVues().'</span> like(s)</div>';
 
-            // var_dump($_SESSION);
-
+      
             if($chanson->getUser() ==  $_SESSION["user"]->getId() || $_SESSION["user"]->getStatut() == "admin"){
+              // die($_SESSION["user"]->getStatut() );
               if( $_SESSION["user"]->getStatut() == "admin"){
                 $this->content.= '<p>
-                <a class="btn btn-red " href="'.$this->router->getchansonAskDeletionUrl($id).'">Supprimer la chanson </a>
-                  <a class="btn btn-green" href="'.$this->router->getchansonAskUpdateURL($id).'">modifier  la chanson </a> 
-                </p></div>';  
+                <a class="btn btn-danger " href="'.$this->router->getchansonAskDeletionUrl($id).'">Supprimer la chanson </a>
+                  <a class="btn btn-warning" href="'.$this->router->getchansonAskUpdateURL($id).'">modifier  la chanson </a> 
+                  <a class="btn btn-green" id ="btn-ajax" op="ajout" lien="'.$this->router->getLikeChansonURL($id).'" onClick="managePlaylist(event);">Ajouter à ma playslist </a> 
+                </p></div><div id="musicID" style="display:none">'.$id.'</div>';
               }else{
                 $this->content.= '<p>
-                  <a class="btn btn-green" lien="'.$this->router->getLikeChansonURL($id).'" onClick="addToplaylist(event);">Ajouter à ma playslist </a> 
-                </p></div>'; 
+                <a class="btn btn-danger " href="'.$this->router->getchansonAskDeletionUrl($id).'">Supprimer la chanson </a>
+                  <a class="btn btn-warning" href="'.$this->router->getchansonAskUpdateURL($id).'">modifier  la chanson </a> 
+                  <a class="btn btn-green" id ="btn-ajax" op="ajout" lien="'.$this->router->getLikeChansonURL($id).'" onClick="managePlaylist(event);">Ajouter à ma playslist </a> 
+                </p></div><div id="musicID" style="display:none">'.$id.'</div>'; 
               }
             }else{
               $this->content.= '<p>
-              <a class="btn btn-green" lien="'.$this->router->getLikeChansonURL($id).'" onClick="addToplaylist(event);">Ajouter à ma playslist </a> 
-                </p></div>'; 
-            }       
+              <a class="btn btn-green" id ="btn-ajax" op="ajout" lien="'.$this->router->getLikeChansonURL($id).'" onClick="managePlaylist(event);">Ajouter à ma playslist </a> 
+                </p></div><div id="musicID" style="display:none">'.$id.'</div>'; 
+            } 
+
+            
+            if($list!=null){
+              $contenu="";
+              $taille= count($list);
+                 foreach($list as $key => $chanson) { 
+              
+                    $contenu.='<div class="card col-3 px-0 mx-5 my-4 bg-secondary" >
+                    <img class="card-img-top" src="/img/music.jpg" alt="Card image cap">
+                    <div class="card-body">
+                      <h5 class="card-title">'.$chanson->getTitre().'</h5>
+                      <p class="card-text"> Informations <br />(Artiste,album,année de sortie):<br>'.$chanson->getArtistes().', '. $chanson->getAlbum().','.$chanson->getDates().'</p>
+                      <a href="'.$this->router->getChansonUrl($key).'" class="btn btn-primary">Voir la musique</a>
+                    </div></div>';  
+                }
+               $this->content.='<br/><br/><hr class="w-100 px-5" /><br /><br/><h4 class="center"> Suggestion des musiques</h4><br /><div class="container-fluid row mx-3">'.$contenu.'</div>';
+              }else{
+                  $this->content.='<br/><br/><hr class="w-100 px-5" /><br /><br/><h4 class="center"> Suggestion des musiques</h4><br/><div class="container-fluid row mx-3"> Liste Vide</div>' ;
+              }
+
 
         }
 
@@ -134,23 +148,28 @@
           $confirmPasswordError= key_exists($account::CONFIRMPASSWORD_REF,$account->getErrors()) ? $account->getErrors()[$account::CONFIRMPASSWORD_REF] : "";
           $avatarError = key_exists($account::FILE_REF,$account->getErrors()) ? $account->getErrors()[$account::FILE_REF] : "";
           $form='<form enctype="multipart/form-data" method="POST" class="formulaire" action="'.$this->router->getConfirmInscriptionURL().'">
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $loginError .'</p>
-              <label>Login<input class="form-input "type="text" name="'.$account::LOGIN_REF.'"  value="'.$loginValue.'" /></label>
+              <label>Login</label>
+              <input class="form-control "type="text" name="'.$account::LOGIN_REF.'"  value="'.$loginValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $nomError .'</p>
-              <label>Nom<input class="form-input "type="text" name="'.$account::NOM_REF.'" placeholder="Enter votre nom" value="'.  $nomValue.'" /></label>
+              <label>Nom</label>
+              <input class="form-control "type="text" name="'.$account::NOM_REF.'" value="'.  $nomValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $passwordError .'</p>
-              <label>Password<input class="form-input "type="password" name="'.$account::PASSWORD_REF.'"  value="'.$passwordValue.'" /></label>
+              <label>Password</label>
+              <input class="form-control "type="password" name="'.$account::PASSWORD_REF.'"  value="'.$passwordValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $confirmPasswordError .'</p>
-              <label>confirmPassword<input class="form-input "type="password" name="'.$account::CONFIRMPASSWORD_REF.'" placeholder="entrer son espéce" value="" /></label>
+              <label>confirmPassword</label>
+              <input class="form-control "type="password" name="'.$account::CONFIRMPASSWORD_REF.'"value="" />
             </div>
-            <div>
+
+            <div class="form-group">
             <p class="error">'. $avatarError .'</p>
               <label for="fichier_a_uploader" title="Recherchez le fichier à uploader !">Envoyer le fichier :</label>
               <input name="avatar" type="file" id="fichier_a_uploader" />  
@@ -162,7 +181,7 @@
            
           </form>';
           $this->title = "Inscription";
-          $this->content=$form;
+             $this->content='<h3 class="center"> Inscription</h3><br>'.$form;
         }
         /**
          * Page d'erreur 
@@ -189,10 +208,16 @@
             $contenu=null;
             $taille= count($list);
             foreach($list as $key => $chanson) { 
-              $contenu.='<div class="card" >Voir la page de: <a href='.$this->router->getChansonUrl($key).'>' 
-              .$chanson->getTitre().' de  '. $chanson->getArtistes().'</a> <div><i class="fa fa-thumbs-up"></i></div></div>' ;
+              $contenu.='<div class="card col-3 px-0 mx-5 my-4 bg-secondary" >
+              <img class="card-img-top" src="/img/music.jpg" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">'.$chanson->getTitre().'</h5>
+                <p class="card-text"> Informations <br />(Artiste,album,année de sortie):<br>'.$chanson->getArtistes().', '. $chanson->getAlbum().','.$chanson->getDates().'</p>
+                <p><i class="fas fa-eye"></i> '.$chanson->getVues().' like(s)<p>
+                <a href="'.$this->router->getChansonUrl($key).'" class="btn btn-primary">Voir la musique</a>
+              </div></div>';
             }
-            $this->content =$contenu;
+             $this->content='<h3 class="center"> Musiques</h3><br><div class="container-fluid row mx-3">'.$contenu.'</div>';
           }else{
             $this->content="<h4 center > La liste est vide </h4>"; 
           }
@@ -221,25 +246,30 @@
 
 
           $form='<form enctype="multipart/form-data" method="POST" class="formulaire" action="'.$this->router->getChansonSaveUrl().'">
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $titreError .'</p>
-              <label>Titre<input class="form-input "type="text" name="'.$chansons::TITRE_REF.'"  value="'.$titreValue.'" /></label>
+              <label>Titre</label>
+              <input class="form-control "type="text" name="'.$chansons::TITRE_REF.'"  value="'.$titreValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $artisteError .'</p>
-              <label>Artiste<input class="form-input "type="text" name="'.$chansons::ARTISTES_REF.'" placeholder="entrer son espéce" value="'.  $artisteValue.'" /></label>
+              <label>Artiste</label>
+              <input class="form-control "type="text" name="'.$chansons::ARTISTES_REF.'" value="'.  $artisteValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $albumError .'</p>
-              <label>Album<input class="form-input "type="text" name="'.$chansons::ALBUM_REF.'"  value="'.$albumValue.'" /></label>
+              <label>Album</label>
+              <input class="form-control "type="text" name="'.$chansons::ALBUM_REF.'"  value="'.$albumValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $styleError .'</p>
-              <label>Style<input class="form-input "type="text" name="'.$chansons::STYLE_REF.'" placeholder="entrer son espéce" value="'.  $styleValue.'" /></label>
+              <label>Style</label>
+              <input class="form-control "type="text" name="'.$chansons::STYLE_REF.'"  value="'.  $styleValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
             <p class="error">'. $anneeError .'</p>
-              <label>annee<input class="form-input "type="text" name="'.$chansons::DATE_REF.'" placeholder="entrer son annee" value="'.  $anneeValue.'" /></label>
+              <label>annee</label>
+              <input class="form-control "type="text" name="'.$chansons::DATE_REF.'"  value="'.  $anneeValue.'" />
             </div>
             <div>
             <p class="error">'. $musicError .'</p>
@@ -247,13 +277,12 @@
               <input name="'.$chansons::FILE_REF.'" type="file" id="fichier_a_uploader" />  
             </div>
 
-
            <div class="form-group center">
               <button type="submit" class="btn btn-blue bnt-form">Ajouter une nouvelle chanson</button>
            </div>
           </form>';
           $this->title = "create de la chanson";
-          $this->content=$form;
+          $this->content='<h3 class="center"> Ajouter une musique au catalogue </h3><br>'.$form;
         }
 
         /**
@@ -292,25 +321,30 @@
 
 
           $form='<form method="POST" action="'.$this->router->getChansonUpdateUrl($id).'">
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $titreError .'</p>
-              <label>Titre<input class="form-input "type="text" name="'.$chansons::TITRE_REF.'"  value="'.$titreValue.'" /></label>
+              <label>Titre</label>
+              <input class="form-control "type="text" name="'.$chansons::TITRE_REF.'"  value="'.$titreValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $artisteError .'</p>
-              <label>Artiste<input class="form-input "type="text" name="'.$chansons::ARTISTES_REF.'" placeholder="entrer son espéce" value="'.  $artisteValue.'" /></label>
+              <label>Artiste</label>
+              <input class="form-control "type="text" name="'.$chansons::ARTISTES_REF.'" value="'.  $artisteValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $albumError .'</p>
-              <label>Album<input class="form-input "type="text" name="'.$chansons::ALBUM_REF.'"  value="'.$albumValue.'" /></label>
+              <label>Album</label>
+              <input class="form-control "type="text" name="'.$chansons::ALBUM_REF.'"  value="'.$albumValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
               <p class="error">'. $styleError .'</p>
-              <label>Style<input class="form-input "type="text" name="'.$chansons::STYLE_REF.'" placeholder="entrer son espéce" value="'.  $styleValue.'" /></label>
+              <label>Style</label>
+              <input class="form-control "type="text" name="'.$chansons::STYLE_REF.'"  value="'.  $styleValue.'" />
             </div>
-            <div class="form-input">
+            <div class="form-group">
             <p class="error">'. $anneeError .'</p>
-              <label>annee<input class="form-input "type="text" name="'.$chansons::DATE_REF.'" placeholder="entrer son annee" value="'.  $anneeValue.'" /></label>
+              <label>annee</label>
+              <input class="form-control "type="text" name="'.$chansons::DATE_REF.'" value="'.  $anneeValue.'" />
             </div>
 
             <div>
@@ -319,7 +353,7 @@
             </div>
           </form>';
           $this->title = "modifier chanson";
-          $this->content=$form;
+          $this->content='<h3 class="center"> Modifier la chanson id: '.$id.'</h3><br>'.$form;
 
         }
 
@@ -392,13 +426,15 @@
           $this->title= "Connexion ";
           $this->content='<h3 class="center"> connectez vous</h3><br>
             <form method="POST" action='.$this->router->getConfirmConnexionURL().'>
-                <div class="form-group">
-                  <label>Login <input class="form-input "type="text" name="login"> </label>
+                <div class="form-group row">
+                  <label class="col-2">Login</label>
+                  <input class="form-control col-10" type="text" name="login">
                 </div>
-                <div class="form-group">
-                  <label>Password <input class="form-input "type="password" name="password"> </label>
+                <div class="form-group row">
+                  <label class="col-2">Password</label>
+                  <input class="form-control col-10" type="password" name="password">
                 </div>
-                <div class="form-group center">
+                <div class="form-group row center">
                   <button type="submit" class="btn btn-form btn-green"> connection </button>
                 </div>
                
@@ -469,6 +505,8 @@
         public function displayAdminPageFeedBack($feedback){
           $this->router->PostRedirect($this->router->rootUrl(),$feedback);
         }
+
+         
     }
 
 

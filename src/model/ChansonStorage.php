@@ -48,14 +48,28 @@
         public function readAllFromUser($id);
 
         /**
-         * Ajout dans les liked;
+         * nombre de likes
+         * retourne nombre de like d'une musique;
          */
-        public function like($idUser, $idMusic);
+        public function nbLike($id);
+
+
+        /**
+         * Affiche tous mes chansons
+         * retourne tous mes  chansons;
+         */
+        public function readPlaylistOfUser($id);
+
 
         /**
          * Ajout dans les liked;
          */
-        public function dislike($idUser, $idMusic);
+        public function like(\model\Likes $a);
+
+        /**
+         * Ajout dans les liked;
+         */
+        public function dislike(\model\Likes $a);
     }
 
 

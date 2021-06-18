@@ -45,8 +45,10 @@
                 $statement->execute();
                 $resultat=$statement->fetch(PDO::FETCH_OBJ);
                 if($resultat !=  NULL){
-                    return  new \model\Chanson($resultat->titre, $resultat->artistes,
-                     $resultat->dates,$resultat->album, $resultat->style,$resultat->link,$resultat->id_user);
+                    $current= new \model\Chanson($resultat->titre, $resultat->artistes,
+                    $resultat->dates,$resultat->album, $resultat->style,$resultat->link,$resultat->id_user);
+                    $current->setVues($this->nbLike($resultat->id));
+                    return $current;
                 }
             }
             return null;
@@ -169,14 +171,16 @@
          */
         public function readAll(){
             if($this->bd){
-                $req = "SELECT * FROM chansons";
+                $req = "SELECT chansons.*, count(id) AS nb FROM  chansons LEFT JOIN likes on chansons.id = likes.id_chanson GROUP BY id order by nb Desc";
                 $statement = $this->bd->prepare($req);
                 $statement->execute();
                 $data=array();
                 while($resultat= $statement->fetch(PDO::FETCH_OBJ)){
-                    $data[$resultat->id]= new \model\Chanson($resultat->titre, $resultat->artistes,
-                     $resultat->dates,$resultat->album, $resultat->style,$resultat->id_user);
-               }
+                    $current= new \model\Chanson($resultat->titre, $resultat->artistes,
+                    $resultat->dates,$resultat->album, $resultat->style,$resultat->link,$resultat->id_user);
+                    $current->setVues($this->nbLike($resultat->id));
+                    $data[$resultat->id]=$current;
+              }
 
                if(count($data)>0){
                  return $data;  
@@ -200,8 +204,10 @@
             }  
             $data=array();
             while($resultat= $statement->fetch(PDO::FETCH_OBJ)){
-                $data[$resultat->id]= new \model\Chanson($resultat->titre, $resultat->artistes,
-                    $resultat->dates,$resultat->album, $resultat->style,$resultat->id_user);
+                $current= new \model\Chanson($resultat->titre, $resultat->artistes,
+                $resultat->dates,$resultat->album, $resultat->style,$resultat->link,$resultat->id_user);
+                $current->setVues($this->nbLike($resultat->id));
+                $data[$resultat->id]=$current;
             }
 
             if(count($data) > 0) {
@@ -210,20 +216,112 @@
 
             return null;
         }
+
+        /**
+         * nombre de likes
+         * retourne nombre de like d'une musique;
+         */
+        public function nbLike($id){
+           
+            if($this->bd){
+                $req= "SELECT COUNT(*) as nbElement  FROM likes WHERE id_chanson=:id";
+                $statement = $this->bd->prepare($req);
+                $statement->bindValue(':id', $id);
+                $statement->execute();
+                $data=$statement->fetch(PDO::FETCH_OBJ);
+                return $data->nbelement;
+            }else{
+                echo "Pas de connection à la base de donnée";
+            }
+              
+        }
+
+
          /**
          * Ajout dans les liked;
          */
-        public function like($idUser, $idMusic){
-            return true;
+        public function like(\model\Likes $a){
+            if($this->bd){
+              if($this->alReadylike($a) <= 0){
+
+                $req= "INSERT INTO likes(id_user
+                ,id_chanson) VALUES(:id_user,:id_chanson)";
+               $statement=$this->bd->prepare($req);
+               $statement->bindValue(':id_chanson', $a->get_id_chanson());
+               $statement->bindValue(':id_user' ,$a->get_id_user());
+               return $statement->execute();  
+              }else{
+                  return "déja";
+              }                
+            }else{
+                return null;
+            }
+        }
+
+
+        public function alReadylike(\model\Likes $a){
+            if($this->bd){
+                $req= "SELECT count(*) as nb FROM likes WHERE id_user=:id_user AND id_chanson=:id_chanson";
+                $statement=$this->bd->prepare($req);
+                $statement->bindValue(':id_chanson', $a->get_id_chanson());
+                $statement->bindValue(':id_user' ,$a->get_id_user());
+                $statement->execute();  
+                $data=$statement->fetch(PDO::FETCH_OBJ);
+               return $data->nb;   
+            }else{
+                return null;
+            }
         }
 
         /**
          * Ajout dans les liked;
          */
-        public function dislike($idUser, $idMusic){
-            return true;
+        public function dislike(\model\Likes $a){
+            if($this->bd){
+                if($this->alReadylike($a) > 0){
+  
+                  $req= "DELETE FROM likes WHERE id_user=:id_user AND id_chanson=:id_chanson";
+                  $statement=$this->bd->prepare($req);
+                  $statement->bindValue(':id_chanson', $a->get_id_chanson());
+                  $statement->bindValue(':id_user' ,$a->get_id_user());
+                  return $statement->execute();  
+                }else{
+                    return "déja";
+                }                
+              }else{
+                  return null;
+              }
+        }
+
+        /**
+        * Affiche tous mes chansons
+        * retourne tous mes  chansons;
+        */
+        public function readPlaylistOfUser($id){
+          
+            if($this->bd){
+               
+                $req = "SELECT * FROM (select chansons.*,likes.id_user as user, likes.id_chanson from chansons INNER join likes on chansons.id = likes.id_chanson) as ta WHERE  ta.user=:user";
+                $statement = $this->bd->prepare($req);
+                $statement->bindValue(':user' , $id);
+                $statement->execute();
+                $data=array();
+                while($resultat= $statement->fetch(PDO::FETCH_OBJ)){
+                    $current= new \model\Chanson($resultat->titre, $resultat->artistes,
+                    $resultat->dates,$resultat->album, $resultat->style,$resultat->link,$resultat->id_user);
+                    $current->setVues($this->nbLike($resultat->id));
+                    $data[$resultat->id]=$current;
+                }
+
+                if(count($data)>0){
+                    return $data;  
+                }    
+            }
+
+            return null;
         }
 
     }
+
 
 ?>

@@ -29,7 +29,10 @@
                     if($account->getLogin()===$login){
                           ;
                         if(password_verify($password,$account->getPassword())){
-                            
+                            // echo "<pre>";
+                            // var_dump($account);
+                            // echo "</pre>";
+                            // die(0);
                             $_SESSION["user"]= $account;
                             return true;
                         }

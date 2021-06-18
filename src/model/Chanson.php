@@ -11,6 +11,7 @@
         private $user;
         private $musique;
         private $ext;
+        private $vues;
 
         public function __construct($titre,$artistes,$dates,$album,$style,$musique,$user=null,$ext=null){
             $this->titre=$titre;
@@ -21,6 +22,7 @@
             $this->user=$user;
             $this->musique=$musique;
             $this->ext=$ext;
+            $this->vues= 0;
         }
 
         public function getId(){
@@ -51,6 +53,9 @@
         public function getExt(){
             return $this->ext;
         }
+        public function getVues(){
+            return $this->vues;
+        }
 
 
         public function setId($id){
@@ -75,9 +80,16 @@
         public function setUser($user){
             $this->user=$user;
         }
+
+        public function setVues($vues){
+            $this->vues=$vues;
+        }
+        
         public function getArray(){
             return get_object_vars($this);
         }
+
+
 
 
 

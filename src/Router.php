@@ -67,6 +67,19 @@
                 $i=1;
                 if($size===2){
                     
+
+                    if(basename(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)) == "ajaxPlaylist"){
+                        echo $controllerChansons->ajaxPlaylist();
+                        echo "jordan";
+                        die;
+                    }
+
+                    if(basename(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)) == "removePlaylist"){
+                        echo $controllerChansons->removePlaylist();
+                        echo "jordan";
+                        die;
+                    }
+                    
                     $action=htmlspecialchars($tab[1]);
                     switch ($action) {
                         case "":
@@ -93,7 +106,7 @@
                                 if($_SESSION["user"]->getStatut()==="admin"){
                                     $controllerAccount->showUserList();
                                 }else{
-                                    $this->view->displayAdminPageFeedBack(".","Vous de ver etre admin pour voir la liste des utilisateur ");
+                                    $this->view->displayAdminPageFeedBack(".","Vous devez etre admin pour voir la liste des utilisateur ");
                                 }
                                 
                             }else{
