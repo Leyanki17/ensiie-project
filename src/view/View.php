@@ -89,7 +89,6 @@
 
       
             if($chanson->getUser() ==  $_SESSION["user"]->getId() || $_SESSION["user"]->getStatut() == "admin"){
-              // die($_SESSION["user"]->getStatut() );
               if( $_SESSION["user"]->getStatut() == "admin"){
                 $this->content.= '<p>
                 <a class="btn btn-danger " href="'.$this->router->getchansonAskDeletionUrl($id).'">Supprimer la chanson </a>
@@ -379,7 +378,7 @@
           $this->title= "Suppression de la Chanson d'identifiant : ".$id;
           $this->content='<h3 class="center"> Confimer la suppression de la chanson d\'identifiant '.$id.'</h3><br>
             <form method="POST" class="center" action="'.$this->router->getChansonDeletionURL($id).'">
-                <button type="submit btn btn-red"> Supprimer la chanson </button>
+                <button type="submit btn btn-danger"> Supprimer la chanson </button>
             </form>
           ';
         }  

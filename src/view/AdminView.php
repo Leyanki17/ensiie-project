@@ -73,7 +73,7 @@
             $this->title= "Suppression de l\'utilisateur d'identifiant : ".$id;
             $this->content='<h3 class="center"> Confimer la suppression de l\'utilisateur d\'identifiant '.$id.'</h3><br>
               <form method="POST" class="center" action="'.$this->router->getDeletionUser($id).'">
-                  <button type="submit btn btn-red "> Supprimer l\'utilisateur </button>
+                  <button type="submit btn btn-danger"> Supprimer l\'utilisateur </button>
               </form>
             ';
         }

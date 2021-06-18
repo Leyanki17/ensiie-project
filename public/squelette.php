@@ -20,12 +20,10 @@
                     <div class="navbar-h">
                         <nav class="navbar">
 
-                            <img src="/img/logo.jpg" class="logo">
+                            <img src="/img/logo.png" class="logo">
                            <? if(key_exists("user",$_SESSION)){
-                            //    var_dump($_SESSION["user"]);
-                            //    die("e");
                                ?>
-                                    <img src="/avatars_img/<? echo $_SESSION["user"]->getId()?>.jpg" class="user_img">
+                                    <img src="/avatars_img/<? echo $_SESSION["user"]->getId();?>.jpg" class="user_img">
                                <?
                            } ?>
                             <? echo $this->menu;?>  

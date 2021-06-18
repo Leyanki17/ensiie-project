@@ -12,7 +12,7 @@ avatar Varchar(1024)
 
 CREATE TABLE chansons
 (
-id SERIAL NOT NULL UNIQUE PRIMARY KEY,
+id SERIAL NOT NULL UNIQUE PRIMARY KEY ,
 titre VARCHAR(120) NOT NULL,
 artistes VARCHAR(120) NOT NULL,
 style VARCHAR(20) NOT NULL,
@@ -23,24 +23,23 @@ id_user INTEGER NOT NULL,
 CONSTRAINT fk_user
 	FOREIGN KEY(id_user)
 	REFERENCES "users"(id)
-
+	ON DELETE CASCADE
 );
-
-
 
 CREATE TABLE likes
 (
- id_user INTEGER NOT NULL,
+ id_user INTEGER NOT NULL ,
  id_chanson INTEGER NOT NULL,
  
  PRIMARY KEY (id_user, id_chanson),
  CONSTRAINT fk_user
 	FOREIGN KEY(id_user)
-	REFERENCES "users"(id),
+	REFERENCES "users"(id)
+	ON DELETE CASCADE,
 CONSTRAINT fk_chanson
 	FOREIGN KEY(id_chanson)
 	REFERENCES chansons(id)
-
+	ON DELETE CASCADE
 );
 --mot de passe azerty--
 INSERT INTO "users" (nom, "login", password, "statut") VALUES ('Jordan', 'phoenix','$2y$10$7MnOgj/InpTjksucOH7oQeVeHTRhvEOT127Z.x7K3gJxuf1DDEPfu','admin');

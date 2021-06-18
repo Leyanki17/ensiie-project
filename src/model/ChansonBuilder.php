@@ -1,7 +1,5 @@
 <?
-
     namespace model;
-
     require_once '/var/www/html/src/Bootstrap.php';
     //constante representan les champs name des formulaires
     
@@ -72,9 +70,10 @@
             // controle sur le titre 
             $this->isValidForUpdate();
 
-            if(key_exists(self::FILE_REF,$this->file) ){
-                
+            if(key_exists(self::FILE_REF,$this->file) && $this->file[self::FILE_REF]["error"] == 0){
+               
                 if($this->file[self::FILE_REF]["size"] < self::MAX_SIZE){
+                    // die(var_dump($this->file));
                     $infos = pathinfo($this->file[self::FILE_REF]["name"]);
                     $ext = $infos["extension"];
                     if(in_array(strtolower($ext), $this->exts)){
@@ -87,10 +86,7 @@
                     $this->errors[self::FILE_REF]="Taille du fichier trop grande"; 
                 }
             }else{
-                echo "<pre>";
-                var_dump($this->file);
-                echo "</pre>";
-                die("".$this->file[self::FILE_REF]["error"]);
+                
                 $this->errors[self::FILE_REF]="Vous devez uploader un fichier";
             }
 
